@@ -1,3 +1,4 @@
 dataset
 models_history
 .jpg
+*.ipynb_checkpoints

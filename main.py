@@ -138,8 +138,10 @@ def test(model, testing_data_loader, criterion):
     print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(testing_data_loader)))
 
 
-def checkpoint(epoch: int, model):
-    model_out_path = "model_epoch_{}.pth".format(epoch)
+def checkpoint(epoch: int, model, history_dir: str):
+    if not exists(history_dir):
+        makedirs(history_dir)
+    model_out_path = join(history_dir, "model_epoch_{}.pth".format(epoch))
     torch.save(model, model_out_path)
     print("Checkpoint saved to {}".format(model_out_path))
 
@@ -212,6 +214,6 @@ if __name__ == '__main__':
     for epoch in range(1, 5):
         train(epoch, model, training_data_loader, criterion, optimizer)
         test(model, testing_data_loader, criterion)
-        checkpoint(epoch, model)
+        checkpoint(epoch, model, 'models_history')
 
     super_resolve('test.jpg', 'out.jpg', model)

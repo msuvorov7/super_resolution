@@ -9,6 +9,8 @@ from PIL import Image
 import torch.utils.data as data
 from os import listdir, makedirs, remove
 from os.path import join, exists, basename
+
+from PIL.Image import Resampling
 from six.moves import urllib
 from torch.utils.data import DataLoader
 from torchvision.transforms import Compose, CenterCrop, Resize, ToTensor
@@ -183,8 +185,8 @@ def super_resolve(input_filename: str, output_filename: str, model):
     out_img_y = out_img_y.clip(0, 255)
     out_img_y = Image.fromarray(np.uint8(out_img_y[0]), mode='L')
 
-    out_img_cb = cb.resize(out_img_y.size, Image.BICUBIC)
-    out_img_cr = cr.resize(out_img_y.size, Image.BICUBIC)
+    out_img_cb = cb.resize(out_img_y.size, Resampling.BICUBIC)
+    out_img_cr = cr.resize(out_img_y.size, Resampling.BICUBIC)
     out_img = Image.merge('YCbCr', [out_img_y, out_img_cb, out_img_cr]).convert('RGB')
 
     out_img.save(output_filename)

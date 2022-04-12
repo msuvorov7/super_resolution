@@ -24,4 +24,4 @@ before_script:
 type_test:
   script:
     - pip3 install mypy
-    - mypy --ignore-missing-imports main.py
+    - mypy --install-types --ignore-missing-imports main.py

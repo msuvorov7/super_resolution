@@ -17,27 +17,53 @@ from torchvision.transforms import Compose, CenterCrop, Resize, ToTensor
 
 
 def is_image_file(filename: str) -> bool:
+    """
+    проверка на то, что файл с расширением изображения
+    :param filename: имя файла
+    :return: bool
+    """
     return any(filename.endswith(extention) for extention in ['.png', '.jpg', '.jpeg'])
 
 
-def load_image(filepath: str):
-    img = Image.open(filepath).convert('YCbCr') # cant convert
+def load_image(filepath: str) -> np.ndarray:
+    """
+    загрузка изображения и разложение по каналам (яркость/синий/красный).
+    в модель идет 1 канал (яркость), но можно переписать код под RGB
+    :param filepath: имя файла
+    :return: первый канал по YCbCr (яркость)
+    """
+    img = Image.open(filepath).convert('YCbCr')
     y, _, _ = img.split()
     return y
 
 
 class DatasetFromFolder(data.Dataset):
     def __init__(self, image_dir: str, input_transform=None, target_transform=None):
+        """
+        создает список из файлов в директории
+        :param image_dir: директория с изображениями
+        :param input_transform: функция преобразования входа (Compose for e.x.)
+        :param target_transform: функция преобразования таргета (Compose for e.x.)
+        """
         super(DatasetFromFolder, self).__init__()
         self.image_filenames = [join(image_dir, x) for x in listdir(image_dir) if is_image_file(x)]
 
         self.input_transform = input_transform
         self.target_transform = target_transform
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """
+        возвращает размер выборки
+        :return:
+        """
         return len(self.image_filenames)
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: int) -> tuple:
+        """
+        итератор для прохода по выборке. применяет преобразования ко входу и таргету
+        :param item: индекс
+        :return: пара из входа и таргета (тензоры)
+        """
         input = load_image(self.image_filenames[item])
         target = input.copy()
         if self.input_transform:
@@ -47,7 +73,12 @@ class DatasetFromFolder(data.Dataset):
         return input, target
 
 
-def download_bsd300(dest='dataset'):
+def download_bsd300(dest: str = 'dataset') -> str:
+    """
+    загружает датасет, если его еще нет
+    :param dest: имя папки для изображений
+    :return: полный путь до изображений
+    """
     output_image_dir = join(dest, 'BSDS300/images')
 
     if not exists(output_image_dir):
@@ -70,7 +101,13 @@ def download_bsd300(dest='dataset'):
     return output_image_dir
 
 
-def input_transform(crop_size, upscale_factor):
+def input_transform(crop_size: int, upscale_factor: int) -> Compose:
+    """
+    преобразование над входным изображением
+    :param crop_size: размер для обрезки
+    :param upscale_factor: во сколько раз сжать
+    :return: функция с переводом в тензор
+    """
     return Compose([
         CenterCrop(crop_size),
         Resize(crop_size // upscale_factor),
@@ -78,18 +115,34 @@ def input_transform(crop_size, upscale_factor):
     ])
 
 
-def target_transform(crop_size):
+def target_transform(crop_size: int) -> Compose:
+    """
+    преобразование над таргетом
+    :param crop_size: размер для обрезки
+    :return: функция с переводом в тензор
+    """
     return Compose([
         CenterCrop(crop_size),
         ToTensor(),
     ])
 
 
-def calculate_valid_crop_size(crop_size, upscale_factor):
+def calculate_valid_crop_size(crop_size: int, upscale_factor: int) -> int:
+    """
+    вычисление корректного размера обрезки
+    :param crop_size: размер обрезки изображения
+    :param upscale_factor: во сколько раз будет сжато изображение
+    :return: обновленный crop_size
+    """
     return crop_size - (crop_size % upscale_factor)
 
 
-def get_training_set(upscale_factor):
+def get_training_set(upscale_factor: int) -> DatasetFromFolder:
+    """
+    производит загрузку данных и инициализирует преобразования
+    :param upscale_factor: параметр сжатия
+    :return: класс типа torch.utils.data.Dataset для обучения
+    """
     root_dir = download_bsd300()
     train_dir = join(root_dir, "train")
     crop_size = calculate_valid_crop_size(256, upscale_factor)
@@ -99,7 +152,12 @@ def get_training_set(upscale_factor):
                              target_transform=target_transform(crop_size))
 
 
-def get_test_set(upscale_factor):
+def get_test_set(upscale_factor: int) -> DatasetFromFolder:
+    """
+    производит загрузку данных и инициализирует преобразования
+    :param upscale_factor: параметр сжатия
+    :return: класс типа torch.utils.data.Dataset для теста
+    """
     root_dir = download_bsd300()
     test_dir = join(root_dir, "test")
     crop_size = calculate_valid_crop_size(256, upscale_factor)
@@ -109,7 +167,20 @@ def get_test_set(upscale_factor):
                              target_transform=target_transform(crop_size))
 
 
-def train(epoch: int, model, training_data_loader, criterion, optimizer):
+def train(epoch: int,
+          model: nn.Module,
+          training_data_loader: DataLoader,
+          criterion: nn.Module,
+          optimizer: torch.optim.Optimizer):
+    """
+    функция для обучения на одной эпохе
+    :param epoch: номер эпохи
+    :param model: модель для обучения
+    :param training_data_loader: тренировочный DataLoader
+    :param criterion: функция потерь
+    :param optimizer: оптимизатор
+    :return:
+    """
     epoch_loss = 0
     for iteration, batch in enumerate(training_data_loader, 1):
         input, target = batch[0].to(device), batch[1].to(device)
@@ -125,7 +196,16 @@ def train(epoch: int, model, training_data_loader, criterion, optimizer):
     print("===> Epoch {} Complete: Avg. Loss: {:.4f}".format(epoch, epoch_loss / len(training_data_loader)))
 
 
-def test(model, testing_data_loader, criterion):
+def test(model: nn.Module,
+         testing_data_loader: DataLoader,
+         criterion: nn.Module):
+    """
+    функция для теста модели на отложенной выборке
+    :param model: модель для теста
+    :param testing_data_loader: тестовый DataLoader
+    :param criterion: функция потерь
+    :return:
+    """
     avg_psnr = 0
     with torch.no_grad():
         for batch in testing_data_loader:
@@ -138,7 +218,14 @@ def test(model, testing_data_loader, criterion):
     print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(testing_data_loader)))
 
 
-def checkpoint(epoch: int, model, history_dir: str):
+def checkpoint(epoch: int, model: nn.Module, history_dir: str):
+    """
+    функция для сохранения состояния модели после эпохи
+    :param epoch: номер эпохи
+    :param model: модель
+    :param history_dir: имя директории для образов
+    :return:
+    """
     if not exists(history_dir):
         makedirs(history_dir)
     model_out_path = join(history_dir, "model_epoch_{}.pth".format(epoch))
@@ -147,7 +234,11 @@ def checkpoint(epoch: int, model, history_dir: str):
 
 
 class SRCNN(nn.Module):
-    def __init__(self, upscale_factor):
+    def __init__(self, upscale_factor: int):
+        """
+        модель для увеличения разрешения. реализация может быть переписана для 3-х каналов
+        :param upscale_factor: во сколько раз увеличить
+        """
         super(SRCNN, self).__init__()
 
         self.relu = nn.ReLU()
@@ -155,11 +246,11 @@ class SRCNN(nn.Module):
         self.conv2 = nn.Conv2d(64, 64, (3, 3), (1, 1), (1, 1))
         self.conv3 = nn.Conv2d(64, 32, (3, 3), (1, 1), (1, 1))
         self.conv4 = nn.Conv2d(32, upscale_factor ** 2, (3, 3), (1, 1), (1, 1))
-        self.pixel_shuffle = nn.PixelShuffle(upscale_factor)
+        self.pixel_shuffle = nn.PixelShuffle(upscale_factor)  # (*, C * r*r, H, W) -> (*, C, H*r, W*r)
 
         self._initialize_weights()
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor):
         x = self.relu(self.conv1(x))
         x = self.relu(self.conv2(x))
         x = self.relu(self.conv3(x))
@@ -173,7 +264,14 @@ class SRCNN(nn.Module):
         init.orthogonal_(self.conv4.weight)
 
 
-def super_resolve(input_filename: str, output_filename: str, model):
+def super_resolve(input_filename: str, output_filename: str, model: nn.Module):
+    """
+    функция для увеличения разрешения изображения
+    :param input_filename: имя файла
+    :param output_filename: имя для upscale-изображения
+    :param model: обученная модель
+    :return:
+    """
     img = Image.open(input_filename).convert('YCbCr')
     y, cb, cr = img.split()
 
@@ -187,6 +285,9 @@ def super_resolve(input_filename: str, output_filename: str, model):
     out_img_y = out_img_y.clip(0, 255)
     out_img_y = Image.fromarray(np.uint8(out_img_y[0]), mode='L')
 
+    # модель обучена только для яркости, поэтому остальные компоненты
+    # проходят через интерполяцию.
+    # реализация для RGB представлена в ноутбуке
     out_img_cb = cb.resize(out_img_y.size, Resampling.BICUBIC)
     out_img_cr = cr.resize(out_img_y.size, Resampling.BICUBIC)
     out_img = Image.merge('YCbCr', [out_img_y, out_img_cb, out_img_cr]).convert('RGB')

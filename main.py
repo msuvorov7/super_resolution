@@ -25,7 +25,7 @@ def is_image_file(filename: str) -> bool:
     return any(filename.endswith(extention) for extention in ['.png', '.jpg', '.jpeg'])
 
 
-def load_image(filepath: str) -> np.array:
+def load_image(filepath: str) -> np.ndarray:
     """
     загрузка изображения и разложение по каналам (яркость/синий/красный).
     в модель идет 1 канал (яркость), но можно переписать код под RGB

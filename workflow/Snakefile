@@ -1,0 +1,33 @@
+from snakemake.io import directory, expand
+
+rule all:
+    input:
+        expand('data/raw/BSDS300/images/'),
+        'models/model.pth',
+        'out.jpg',
+        'psnr.jpg',
+        'mse_loss.jpg'
+
+rule download_dataset:
+    output:
+        directory('data/raw/BSDS300/images/')
+    shell:
+        'python src/data/data_load.py'
+
+rule fit_model:
+    input:
+        expand('data/raw/BSDS300/images/')
+    output:
+        'models/model.pth',
+        'psnr.jpg',
+        'mse_loss.jpg'
+    shell:
+        'python src/models/train_model.py --epochs 50'
+
+rule evaluate_model:
+    input:
+        'models/model.pth'
+    output:
+        'out.jpg'
+    shell:
+        'python src/models/predict_model.py --input test.jpg --output {output} --model {input}'

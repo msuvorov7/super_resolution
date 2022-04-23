@@ -29,3 +29,7 @@ def download_bsd300(dest: str = 'data/raw') -> str:
         os.remove(file_path)
 
     return output_image_dir
+
+
+if __name__ == '__main__':
+    download_bsd300()

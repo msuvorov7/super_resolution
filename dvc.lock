@@ -1,0 +1,44 @@
+schema: '2.0'
+stages:
+  download_data:
+    cmd: python src/data/data_load.py
+    deps:
+    - path: src/data/data_load.py
+      md5: 85962b85cc7f5882b00dd0bf8339c0f2
+      size: 1040
+    outs:
+    - path: data/raw/BSDS300/images/
+      md5: b293bc782b9deb97df5a4f94191280fd.dir
+      size: 22247231
+      nfiles: 300
+  evaluate_model:
+    cmd: python src/models/predict_model.py --input test.jpg --output out.jpg --model
+      models/model.pth
+    deps:
+    - path: models/model.pth
+      md5: 4f5557fb08b6bdb2c59814a6714a44c8
+      size: 236687
+    - path: src/models/predict_model.py
+      md5: 641dd51f6bb8f396e19e364aba3548fb
+      size: 2057
+    outs:
+    - path: out.jpg
+      md5: bb7269cc38127d22060d122501c4767c
+      size: 194879
+  fit_model:
+    cmd: python src/models/train_model.py --epoch=3
+    deps:
+    - path: data/raw/BSDS300/images/
+      md5: b293bc782b9deb97df5a4f94191280fd.dir
+      size: 22247231
+      nfiles: 300
+    - path: src/models/train_model.py
+      md5: 447adfb59976377a486fdb12e986efbd
+      size: 4773
+    outs:
+    - path: mse_loss.jpg
+      md5: 3f4fc92e2be690bd237052285396957c
+      size: 47112
+    - path: psnr.jpg
+      md5: a297816f74f2cbc60bea5dc146d7b244
+      size: 45797

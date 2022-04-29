@@ -1,0 +1,24 @@
+stages:
+  download_data:
+    cmd: python src/data/data_load.py
+    deps:
+      - src/data/data_load.py
+    outs:
+      - data/raw/BSDS300/images/
+
+  fit_model:
+    cmd: python src/models/train_model.py --epoch=3
+    deps:
+      - data/raw/BSDS300/images/
+      - src/models/train_model.py
+    outs:
+      - psnr.jpg
+      - mse_loss.jpg
+
+  evaluate_model:
+    cmd: python src/models/predict_model.py --input test.jpg --output out.jpg --model models/model.pth
+    deps:
+      - models/model.pth
+      - src/models/predict_model.py
+    outs:
+      - out.jpg

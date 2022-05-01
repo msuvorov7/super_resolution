@@ -1,4 +1,4 @@
 [core]
-    remote = super_resolution_dvc
-['remote "super_resolution_dvc"']
-    url = https://drive.google.com/drive/folders/1U6S9EAkjz4p1-IH8lYYiU7U9Z9sGaSDu?usp=sharing
+    remote = super_resolution
+['remote "super_resolution"']
+    url = gdrive://1U6S9EAkjz4p1-IH8lYYiU7U9Z9sGaSDu

@@ -16,17 +16,17 @@ stages:
       models/model.pth
     deps:
     - path: models/model.pth
-      md5: 4f5557fb08b6bdb2c59814a6714a44c8
+      md5: 1196754a05fc2794f40cd7f66bcfe934
       size: 236687
     - path: src/models/predict_model.py
       md5: 641dd51f6bb8f396e19e364aba3548fb
       size: 2057
     outs:
     - path: out.jpg
-      md5: bb7269cc38127d22060d122501c4767c
-      size: 194879
+      md5: 4a641e76e62e7c5396ef68dc45f51d04
+      size: 231381
   fit_model:
-    cmd: python src/models/train_model.py --epoch=3
+    cmd: python src/models/train_model.py --epoch=5
     deps:
     - path: data/raw/BSDS300/images/
       md5: b293bc782b9deb97df5a4f94191280fd.dir
@@ -37,8 +37,8 @@ stages:
       size: 4773
     outs:
     - path: mse_loss.jpg
-      md5: 3f4fc92e2be690bd237052285396957c
-      size: 47112
+      md5: 025a6a7d051db33db9bfb5b75d6af8e4
+      size: 44877
     - path: psnr.jpg
-      md5: a297816f74f2cbc60bea5dc146d7b244
-      size: 45797
+      md5: ac5c27e1e2dbf4eff4b8fb1fbc76e3a1
+      size: 46716

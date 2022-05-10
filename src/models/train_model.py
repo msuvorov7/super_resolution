@@ -8,6 +8,10 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
+import mlflow
+
+from mlflow import log_param, log_metric
+
 sys.path.insert(0, os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 ))
@@ -15,6 +19,8 @@ sys.path.insert(0, os.path.dirname(
 from src.features.build_dataset import get_training_set, get_test_set
 from src.models.model import SRCNN
 from src.visualization.visualize import plot_psnr, plot_loss
+
+mlflow.set_tracking_uri('http://0.0.0.0:8000/')
 
 
 def train(epoch: int,
@@ -95,6 +101,8 @@ def checkpoint(epoch: int, model: nn.Module, history_dir: str):
 
 
 def fit(epochs: int):
+    log_param('epochs', epochs)
+
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     train_set = get_training_set(upscale_factor=2)
     test_set = get_test_set(upscale_factor=2)
@@ -125,7 +133,12 @@ def fit(epochs: int):
         train_psnrs.append(train_psnr)
         val_psnrs.append(val_psnr)
 
+        log_metric('psnr', val_psnr)
+
     torch.save(model, 'models/model.pth')
+    mlflow.pytorch.log_model(pytorch_model=model,
+                             artifact_path='models/model.pth',
+                             registered_model_name='cnn_YCbCr')
 
     plot_psnr(train_psnrs, val_psnrs)
     plot_loss(train_losses, val_losses)

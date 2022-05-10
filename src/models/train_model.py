@@ -20,7 +20,8 @@ from src.features.build_dataset import get_training_set, get_test_set
 from src.models.model import SRCNN
 from src.visualization.visualize import plot_psnr, plot_loss
 
-mlflow.set_tracking_uri('http://0.0.0.0:8000/')
+# mlflow.set_tracking_uri('http://0.0.0.0:8000/')  # postgres
+mlflow.set_tracking_uri('http://127.0.0.1:5000/')  # sqlite
 
 
 def train(epoch: int,

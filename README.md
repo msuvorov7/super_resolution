@@ -40,5 +40,5 @@ Application for MLOps course from ODS
   aws_secret_access_key=AS_IN_.ENV
   aws_bucket_name=AS_IN_.ENV
   ```
-  - `MLFLOW_S3_ENDPOINT_URL=http://localhost:9000` very IMPORTANT
+  - `MLFLOW_S3_ENDPOINT_URL=http://localhost:9000` very IMPORTANT (.env)
   

@@ -30,6 +30,7 @@ Application for MLOps course from ODS
   (don't forget change `mlflow.set_tracking_uri` in `train_model.py`)
 
 ## MLflow in docker
+- create .env file like .env.example in project_root_dir
 - mlflow uses boto3 to get access for s3 storage, you need to:
   - `mkdir ~/.aws`
   - `nano ~/.aws/credentials`

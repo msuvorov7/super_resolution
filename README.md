@@ -28,3 +28,16 @@ Application for MLOps course from ODS
     - `mlflow server --backend-store-uri sqlite:///mydb.sqlite --default-artifact-root ./mlruns/artifacts/ --host localhost`
   
   (don't forget change `mlflow.set_tracking_uri` in `train_model.py`)
+
+## MLflow in docker
+- mlflow uses boto3 to get access for s3 storage, you need to:
+  - `mkdir ~/.aws`
+  - `nano ~/.aws/credentials`
+  ```
+  [default]
+  aws_access_key_id=AS_IN_.ENV
+  aws_secret_access_key=AS_IN_.ENV
+  aws_bucket_name=AS_IN_.ENV
+  ```
+  - `MLFLOW_S3_ENDPOINT_URL=http://localhost:9000` very IMPORTANT
+  

@@ -11,6 +11,7 @@ from torch.utils.data import DataLoader
 import mlflow
 
 from mlflow import log_param, log_metric
+from dotenv import load_dotenv
 
 sys.path.insert(0, os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -20,8 +21,14 @@ from src.features.build_dataset import get_training_set, get_test_set
 from src.models.model import SRCNN
 from src.visualization.visualize import plot_psnr, plot_loss
 
+
+load_dotenv()
+remote_server_uri = os.getenv("MLFLOW_TRACKING_URI")
+mlflow.set_tracking_uri(remote_server_uri)
+
+
 # mlflow.set_tracking_uri('http://0.0.0.0:8000/')  # postgres
-mlflow.set_tracking_uri('http://127.0.0.1:5000/')  # sqlite
+# mlflow.set_tracking_uri('http://127.0.0.1:5000/')  # sqlite
 
 
 def train(epoch: int,
@@ -102,44 +109,48 @@ def checkpoint(epoch: int, model: nn.Module, history_dir: str):
 
 
 def fit(epochs: int):
-    log_param('epochs', epochs)
+    with mlflow.start_run():
+        mlflow.get_artifact_uri()
+        print(mlflow.get_artifact_uri())
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    train_set = get_training_set(upscale_factor=2)
-    test_set = get_test_set(upscale_factor=2)
+        log_param('epochs', epochs)
 
-    batch_size = 32
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        train_set = get_training_set(upscale_factor=2)
+        test_set = get_test_set(upscale_factor=2)
 
-    training_data_loader = DataLoader(dataset=train_set, num_workers=2, batch_size=batch_size,
-                                      shuffle=True)
-    testing_data_loader = DataLoader(dataset=test_set, num_workers=2, batch_size=batch_size,
-                                     shuffle=False)
+        batch_size = 32
 
-    model = SRCNN(upscale_factor=2).to(device)
-    criterion = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+        training_data_loader = DataLoader(dataset=train_set, num_workers=2, batch_size=batch_size,
+                                          shuffle=True)
+        testing_data_loader = DataLoader(dataset=test_set, num_workers=2, batch_size=batch_size,
+                                         shuffle=False)
 
-    train_losses = []
-    val_losses = []
-    train_psnrs = []
-    val_psnrs = []
+        model = SRCNN(upscale_factor=2).to(device)
+        criterion = nn.MSELoss()
+        optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-    for epoch in range(1, epochs):
-        train_loss, train_psnr = train(epoch, model, training_data_loader, criterion, optimizer, device)
-        val_loss, val_psnr = test(model, testing_data_loader, criterion, device)
-        checkpoint(epoch, model, 'models')
+        train_losses = []
+        val_losses = []
+        train_psnrs = []
+        val_psnrs = []
 
-        train_losses.append(train_loss)
-        val_losses.append(val_loss)
-        train_psnrs.append(train_psnr)
-        val_psnrs.append(val_psnr)
+        for epoch in range(1, epochs):
+            train_loss, train_psnr = train(epoch, model, training_data_loader, criterion, optimizer, device)
+            val_loss, val_psnr = test(model, testing_data_loader, criterion, device)
+            checkpoint(epoch, model, 'models')
 
-        log_metric('psnr', val_psnr)
+            train_losses.append(train_loss)
+            val_losses.append(val_loss)
+            train_psnrs.append(train_psnr)
+            val_psnrs.append(val_psnr)
 
-    torch.save(model, 'models/model.pth')
-    mlflow.pytorch.log_model(pytorch_model=model,
-                             artifact_path='models/model.pth',
-                             registered_model_name='cnn_YCbCr')
+            log_metric('psnr', val_psnr)
+
+        torch.save(model, 'models/model.pth')
+        mlflow.pytorch.log_model(pytorch_model=model,
+                                 artifact_path='models/model.pth',
+                                 registered_model_name='cnn_YCbCr')
 
     plot_psnr(train_psnrs, val_psnrs)
     plot_loss(train_losses, val_losses)

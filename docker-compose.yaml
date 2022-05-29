@@ -67,6 +67,23 @@ services:
     networks:
       - postgres
 
+  mlflow:
+    restart: always
+    image: mlflow_server
+    container_name: mlflow_server
+    ports:
+      - "5001:5000"  # for macOS 5000 port for AirDrop?
+    networks:
+      - postgres
+      - s3
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - MLFLOW_S3_ENDPOINT_URL=http://nginx:9000
+    command: mlflow server --backend-store-uri postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/${POSTGRES_DB} --default-artifact-root s3://${AWS_S3_BUCKET}/ --host 0.0.0.0
+
+
+
 networks:
   s3:
     driver: bridge

@@ -149,7 +149,7 @@ def fit(epochs: int):
 
         torch.save(model, 'models/model.pth')
         mlflow.pytorch.log_model(pytorch_model=model,
-                                 artifact_path='models/model.pth',
+                                 artifact_path='models',
                                  registered_model_name='cnn_YCbCr')
 
     plot_psnr(train_psnrs, val_psnrs)

@@ -33,12 +33,12 @@ stages:
       size: 22247231
       nfiles: 300
     - path: src/models/train_model.py
-      md5: 34c0a3e685b0ed48d81c779412358f74
-      size: 5568
+      md5: aafa11d7778807c1f40ac6e35b8110b5
+      size: 5558
     outs:
     - path: mse_loss.jpg
-      md5: 5c945a5f4b162be665c1ad43b86b4e60
-      size: 48723
+      md5: b79c4436fa726e76b46d928b326a261a
+      size: 46557
     - path: psnr.jpg
-      md5: e2d95c197416d96b5895ab1d66a27c55
-      size: 48559
+      md5: 1e4f4f2d8e4d23eeff9ae1c7027d66d4
+      size: 48265

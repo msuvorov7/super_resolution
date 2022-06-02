@@ -41,4 +41,11 @@ Application for MLOps course from ODS
   aws_bucket_name=AS_IN_.ENV
   ```
   - `MLFLOW_S3_ENDPOINT_URL=http://localhost:9000` very IMPORTANT (.env)
+
+## FastAPI
+- `docker build -f Docker/mlflow_image/Dockerfile -t mlflow_server .`
+- `docker build -f Docker/model_service/Dockerfile -t model_service .`
+- `docker-compose up -d --build`
+
+Address: 127.0.0.1:8000
   

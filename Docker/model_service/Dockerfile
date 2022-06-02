@@ -8,7 +8,8 @@ RUN pip install poetry
 #
 COPY ./Docker/model_service/pyproject.toml ./Docker/model_service/poetry.lock /code/
 
-COPY ../../src/app /code/app
+COPY ./src/app /code/app
+COPY ./src /code/src
 COPY ./Docker/model_service/.env /code/app/.env
 
 

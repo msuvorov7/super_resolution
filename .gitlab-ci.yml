@@ -26,14 +26,14 @@ before_script:
   - source venv/bin/activate
   - pip3 install -r requirements.txt
 
-unittest:
-  - dvc pull
-  - dvc repro
-  - python -m unittest discover tests
-
-
 type_test:
   script:
     - pip3 install mypy
     - pip3 install types-six
     - mypy --ignore-missing-imports main.py
+
+unit_test:
+  script:
+    - dvc pull
+    - dvc repro
+    - python -m unittest discover tests

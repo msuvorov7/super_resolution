@@ -5,3 +5,4 @@
     gdrive_client_id = 189569453864-cquuo1pmjpanpk2ehfsb5aths58r7tff.apps.googleusercontent.com
     gdrive_client_secret = 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
     gdrive_use_service_account = true
+    gdrive_service_account_json_file_path = superresolution-348908-cd1185a9333d.json

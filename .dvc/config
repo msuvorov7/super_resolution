@@ -1,4 +1,7 @@
 [core]
-    remote = super_resolution
-['remote "super_resolution"']
+    remote = superresolution
+['remote "superresolution"']
     url = gdrive://1U6S9EAkjz4p1-IH8lYYiU7U9Z9sGaSDu
+    gdrive_client_id = 189569453864-cquuo1pmjpanpk2ehfsb5aths58r7tff.apps.googleusercontent.com
+    gdrive_client_secret = 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
+    gdrive_use_service_account = true

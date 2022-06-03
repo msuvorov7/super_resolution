@@ -1,5 +1,4 @@
 import os
-import numpy as np
 import torch.utils.data as data
 from PIL import Image
 from src.data.data_load import download_bsd300
@@ -15,7 +14,7 @@ def is_image_file(filename: str) -> bool:
     return any(filename.endswith(extention) for extention in ['.png', '.jpg', '.jpeg'])
 
 
-def load_image(filepath: str) -> np.ndarray:
+def load_image(filepath: str) -> Image.Image:
     """
     загрузка изображения и разложение по каналам (яркость/синий/красный).
     в модель идет 1 канал (яркость), но можно переписать код под RGB

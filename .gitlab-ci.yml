@@ -18,7 +18,7 @@ cache:
     prefix: ${CI_JOB_NAME}
   paths:
     - .cache/pip
-    - .venv/
+    - venv/
 
 before_script:
   - python3.9 --version  # For debugging

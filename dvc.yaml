@@ -7,7 +7,7 @@ stages:
       - data/raw/BSDS300/images/
 
   fit_model:
-    cmd: python src/models/train_model.py --epoch=1
+    cmd: python src/models/train_model.py --epoch=2
     deps:
       - data/raw/BSDS300/images/
       - src/models/train_model.py
@@ -18,6 +18,7 @@ stages:
   evaluate_model:
     cmd: python src/models/predict_model.py --input test.jpg --output out.jpg --model models/model.pth
     deps:
+      - test.jpg
       - models/model.pth
       - src/models/predict_model.py
     outs:

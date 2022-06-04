@@ -2,6 +2,8 @@
 
 Application for MLOps course from ODS
 
+[Description](https://yandex.ru/q/article/proekt_po_kursu_mlops_6a54c39d/) on Yandex/Q
+
 ## Snakemake run
 - `snakemake -n` 
 - `snakemake -p`

@@ -18,6 +18,7 @@ stages:
   evaluate_model:
     cmd: python src/models/predict_model.py --input test.jpg --output out.jpg --model models/model.pth
     deps:
+      - test.jpg
       - models/model.pth
       - src/models/predict_model.py
     outs:

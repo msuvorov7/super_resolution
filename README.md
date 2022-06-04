@@ -48,4 +48,13 @@ Application for MLOps course from ODS
 - `docker-compose up -d --build`
 
 Address: 127.0.0.1:8000
+
+## Nexus
+- `docker exec -it nexus bash`
+  - copy pass from /nexus-data/admin.password
+- sign in 127.0.0.1:8082 (login:admin)
+- create docker(hosted) repository with HTTP port 8123
+- `docker login -u admin -p <password> 127.0.0.1:8123`
+- `docker tag model_service:latest 127.0.0.1:8123/model_service:v1`
+- `docker push 127.0.0.1:8123/model_service:v1`
   
